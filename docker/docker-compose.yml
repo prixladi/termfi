@@ -10,8 +10,6 @@ x-minio-common: &minio-common
   environment:
     MINIO_ROOT_USER: minioadmin
     MINIO_ROOT_PASSWORD: minioadmin
-    ACCESS_KEY_ID: Q3AM3UQ867SPQQA43P2F
-    SECRET_ACCESS_KEY: zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG
   healthcheck:
     test: ["CMD", "mc", "ready", "local"]
     interval: 5s

@@ -12,7 +12,7 @@ import (
 	"github.com/prixladi/termfi/utils"
 )
 
-func DownloadFile(url string, dest string, fileSize int64) {
+func DownloadFile(url string, dest string, fileSize int64) error {
 	fmt.Printf("Downloading file '%s' from %s\n", dest, url)
 
 	var path bytes.Buffer
@@ -22,8 +22,7 @@ func DownloadFile(url string, dest string, fileSize int64) {
 
 	out, err := os.Create(path.String())
 	if err != nil {
-		fmt.Println(path.String())
-		panic(err)
+		return err
 	}
 	defer out.Close()
 
@@ -32,18 +31,20 @@ func DownloadFile(url string, dest string, fileSize int64) {
 
 	resp, err := http.Get(url)
 	if err != nil {
-		panic(err)
+		return err
 	}
 	defer resp.Body.Close()
 
 	n, err := io.Copy(out, resp.Body)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	done <- n
 
 	utils.ReplacefLine("Download to local file '%s' completed in %s", dest, time.Since(start))
+
+	return nil
 }
 
 func printDownloadPercent(done chan int64, path string, total int64) {

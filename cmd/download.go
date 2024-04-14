@@ -29,7 +29,10 @@ var getCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		url := args[0]
 
-		fileInfo := storage.GetFileInfo(url)
+		fileInfo, err := storage.GetFileInfo(url)
+		if err != nil {
+			return err
+		}
 
 		if !fileInfo.IsTermfiFile {
 			noCheck, err := strconv.ParseBool(cmd.Flag("no-check").Value.String())
@@ -38,8 +41,7 @@ var getCmd = &cobra.Command{
 			}
 		}
 
-		download.DownloadFile(url, fmt.Sprintf("./%s", fileInfo.FileName), fileInfo.Size)
-		return nil
+		return download.DownloadFile(url, fmt.Sprintf("./%s", fileInfo.FileName), fileInfo.Size)
 	},
 }
 

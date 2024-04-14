@@ -15,8 +15,11 @@ type FileInfo struct {
 	FileName     string
 }
 
-func GetFileInfo(uri string) FileInfo {
-	size := getRemoteFileSize(uri)
+func GetFileInfo(uri string) (*FileInfo, error) {
+	size, err := getRemoteFileSize(uri)
+	if err != nil {
+		return nil, err
+	}
 
 	u, _ := url.Parse(uri)
 
@@ -33,13 +36,13 @@ func GetFileInfo(uri string) FileInfo {
 		fileInfo.FileName = objectInfo.fileName
 	}
 
-	return fileInfo
+	return &fileInfo, nil
 }
 
-func getRemoteFileSize(url string) int64 {
+func getRemoteFileSize(url string) (int64, error) {
 	headResp, err := http.Head(url)
 	if err != nil {
-		panic(err)
+		return 0, nil
 	}
 	defer headResp.Body.Close()
 
@@ -48,7 +51,7 @@ func getRemoteFileSize(url string) int64 {
 		fmt.Print(err.Error())
 	}
 
-	return int64(size)
+	return int64(size), nil
 }
 
 func getLocalFileSize(filePath string) (int64, error) {
@@ -60,7 +63,7 @@ func getLocalFileSize(filePath string) (int64, error) {
 
 	fi, err := file.Stat()
 	if err != nil {
-		fmt.Print(err.Error())
+		fmt.Printf("Unable to read %s file stats, error: %s", filePath, err.Error())
 	}
 
 	return fi.Size(), nil
